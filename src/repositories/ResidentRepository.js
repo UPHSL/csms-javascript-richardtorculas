@@ -1,4 +1,4 @@
-import { Resident } from "../models/Resident.js";
+﻿import { Resident } from "../models/Resident.js";
 import { openDatabase } from "../database/database.js";
 
 /**
@@ -74,6 +74,55 @@ export class ResidentRepository {
     }
 
     return this._rowToResident(row);
+  }
+
+/**
+   * List all persisted Residents in deterministic order.
+   *
+   * T05 requires predictable ordering independent of insertion order:
+   * lastName ascending, then firstName ascending, then id ascending.
+   * COLLATE NOCASE makes the ordering case-insensitive where possible.
+   *
+   * @returns {Resident[]} All Resident records, or an empty array when none.
+   */
+  listResidents() {
+    const query = this._db.prepare(`
+      SELECT id, first_name, last_name, address, contact_number, email, status
+      FROM   residents
+      ORDER BY last_name  COLLATE NOCASE ASC,
+               first_name COLLATE NOCASE ASC,
+               id ASC
+    `);
+
+    return query.all()
+      .map((row) => this._rowToResident(row));
+  }
+
+  /**
+   * Search persisted Residents by first name or last name.
+   *
+   * The search term is passed as a bound parameter, never concatenated
+   * into the SQL text.  SQLite's LIKE is case-insensitive for ASCII, so
+   * partial matches are case-insensitive by default.  Results use the
+   * same deterministic ordering as listResidents().
+   *
+   * @param {string} searchTerm - Trimmed, non-blank name text to search for.
+   * @returns {Resident[]} Matching Resident records, or an empty array.
+   */
+  searchResidents(searchTerm) {
+    const query = this._db.prepare(`
+      SELECT id, first_name, last_name, address, contact_number, email, status
+      FROM   residents
+      WHERE  first_name LIKE :pattern OR last_name LIKE :pattern
+      ORDER BY last_name  COLLATE NOCASE ASC,
+               first_name COLLATE NOCASE ASC,
+               id ASC
+    `);
+
+    const pattern = `%${searchTerm}%`;
+
+    return query.all({ pattern })
+      .map((row) => this._rowToResident(row));
   }
 
   /**
