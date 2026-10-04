@@ -123,6 +123,41 @@ export class ResidentRepository {
   }
 
   /**
+   * Soft-deactivate a persisted Resident by changing its status to Inactive.
+   *
+   * T07 deliberately performs a scoped, parameterized status update only:
+   *
+   *   UPDATE residents
+   *   SET    status = 'Inactive'
+   *   WHERE  id = :id
+   *
+   * The id and every personal/contact column are left untouched, and the
+   * UPDATE targets exactly one Resident row via the bound id — no unbounded
+   * update, no physical DELETE, and no INSERT are ever produced.  The
+   * business rule "Active becomes Inactive" is enforced by the
+   * ResidentDeactivationService; this repository operation only persists the
+   * status change onto the requested Resident.
+   *
+   * After the update the affected row is re-read through findById so the
+   * returned Resident always reflects the actual persisted state.
+   *
+   * @param {number} residentId - The id of the Resident to deactivate.
+   * @returns {Resident|null} The persisted Resident with status Inactive, or
+   *   null when no Resident exists for the supplied id.
+   */
+  deactivate(residentId) {
+    const update = this._db.prepare(`
+      UPDATE residents
+      SET    status = 'Inactive'
+      WHERE  id = :id
+    `);
+
+    update.run({ id: residentId });
+
+    return this.findById(residentId);
+  }
+
+  /**
    * List all persisted Residents in deterministic order.
    *
    * T05 requires predictable ordering independent of insertion order:
