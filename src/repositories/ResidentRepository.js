@@ -77,6 +77,52 @@ export class ResidentRepository {
   }
 
 /**
+   * Update the permitted editable information of an existing persisted Resident.
+   *
+   * T06 deliberately touches only the editable columns:
+   *   first_name, last_name, address, contact_number, email
+   *
+   * The id and status columns are NOT part of the SET clause, so this
+   * operation can never change a Resident's identity or its status.  The
+   * UPDATE is always scoped by id (WHERE id = :id), so exactly one Resident
+   * row is targeted and unrelated Residents are left untouched.  No unbounded
+   * update is ever produced.
+   *
+   * Uses a prepared statement with bound parameters so Resident data is never
+   * concatenated directly into SQL.  After the update the affected row is
+   * re-read through findById so the returned Resident always reflects the
+   * actual persisted state.
+   *
+   * @param {number} residentId - The id of the existing Resident to update.
+   * @param {Resident} resident - A Resident whose editable fields supply the
+   *   proposed updated values.
+   * @returns {Resident|null} The updated persisted Resident, or null when no
+   *   Resident exists for the supplied id.
+   */
+  update(residentId, resident) {
+    const update = this._db.prepare(`
+      UPDATE residents
+      SET    first_name     = :firstName,
+             last_name      = :lastName,
+             address        = :address,
+             contact_number = :contactNumber,
+             email          = :email
+      WHERE  id = :id
+    `);
+
+    update.run({
+      id:           residentId,
+      firstName:    resident.firstName,
+      lastName:     resident.lastName,
+      address:      resident.address,
+      contactNumber: resident.contactNumber,
+      email:        resident.email
+    });
+
+    return this.findById(residentId);
+  }
+
+  /**
    * List all persisted Residents in deterministic order.
    *
    * T05 requires predictable ordering independent of insertion order:
