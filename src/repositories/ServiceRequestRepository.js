@@ -110,6 +110,31 @@ export class ServiceRequestRepository {
   }
 
   /**
+   * Update the status of an existing Service Request.
+   *
+   * Uses a prepared UPDATE statement with bound parameters targeting
+   * the specific Service Request by its id.
+   *
+   * @param {number} serviceRequestId - The id of the Service Request to update.
+   * @param {string} status - The new status value.
+   * @returns {boolean} True if a row was updated, false if not found.
+   */
+  updateStatus(serviceRequestId, status) {
+    const update = this._db.prepare(`
+      UPDATE service_requests
+      SET status = :status
+      WHERE id = :id
+    `);
+
+    const result = update.run({
+      id: serviceRequestId,
+      status: status
+    });
+
+    return result.changes > 0;
+  }
+
+  /**
    * Close the underlying database connection.
    * Should be called when the repository is no longer needed —
    * especially important in tests to release file locks.
