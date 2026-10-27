@@ -135,6 +135,87 @@ export class ServiceRequestRepository {
   }
 
   /**
+   * List all persisted Service Requests in deterministic order.
+   *
+   * T11 requires predictable ordering independent of insertion order:
+   * dateRequested DESC, then id DESC.
+   *
+   * @returns {ServiceRequest[]} All Service Request records, or an empty array.
+   */
+  listServiceRequests() {
+    const query = this._db.prepare(`
+      SELECT id, resident_id, service_type, description, date_requested, status
+      FROM   service_requests
+      ORDER BY date_requested DESC,
+               id DESC
+    `);
+
+    return query.all()
+      .map((row) => this._rowToServiceRequest(row));
+  }
+
+  /**
+   * Search persisted Service Requests by serviceType OR description.
+   *
+   * The search term is passed as a bound parameter, never concatenated
+   * into the SQL text.  SQLite's LIKE is case-insensitive for ASCII, so
+   * partial matches are case-insensitive by default.  A Service Request
+   * whose serviceType OR description contains the pattern is returned.
+   *
+   * Results use the same deterministic ordering as listServiceRequests().
+   *
+   * @param {string} searchTerm - Trimmed, non-blank text to search for.
+   * @param {string|null} statusFilter - Optional status to filter by.
+   * @returns {ServiceRequest[]} Matching Service Request records, or an empty array.
+   */
+  searchServiceRequests(searchTerm, statusFilter = null) {
+    const pattern = `%${searchTerm}%`;
+
+    let sql = `
+      SELECT id, resident_id, service_type, description, date_requested, status
+      FROM   service_requests
+      WHERE  (service_type LIKE :pattern OR description LIKE :pattern)
+    `;
+
+    const params = { pattern };
+
+    if (statusFilter !== null && statusFilter !== undefined) {
+      sql += `    AND status = :statusFilter`;
+      params.statusFilter = statusFilter;
+    }
+
+    sql += `
+      ORDER BY date_requested DESC,
+               id DESC
+    `;
+
+    const query = this._db.prepare(sql);
+    return query.all(params)
+      .map((row) => this._rowToServiceRequest(row));
+  }
+
+  /**
+   * Filter Service Requests by status only (no text search).
+   *
+   * Used when a status filter is supplied without a search term.
+   *
+   * @param {string} statusFilter - The status to filter by.
+   * @returns {ServiceRequest[]} Matching Service Request records, or an empty array.
+   */
+  filterByStatus(statusFilter) {
+    const query = this._db.prepare(`
+      SELECT id, resident_id, service_type, description, date_requested, status
+      FROM   service_requests
+      WHERE  status = :statusFilter
+      ORDER BY date_requested DESC,
+               id DESC
+    `);
+
+    return query.all({ statusFilter })
+      .map((row) => this._rowToServiceRequest(row));
+  }
+
+  /**
    * Close the underlying database connection.
    * Should be called when the repository is no longer needed —
    * especially important in tests to release file locks.
