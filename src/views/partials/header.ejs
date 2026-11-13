@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title><%= title %> | CSMS</title>
+  <title><%= title %> | <%= release.shortName %></title>
 
   <link
     rel="stylesheet"
@@ -18,7 +18,7 @@
 
 <body class="app">
   <header class="app-header">
-    <a class="brand" href="/">CSMS</a>
+    <a class="brand" href="/"><%= release.shortName %></a>
 
     <nav aria-label="Main navigation">
       <a href="/dashboard">Dashboard</a>

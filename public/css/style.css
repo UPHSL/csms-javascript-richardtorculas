@@ -506,3 +506,20 @@ textarea {
   border-color: #1d4ed8;
   background: #eff6ff;
 }
+
+
+/* ------------------------------------------------------------------ */
+/* T16 - Release identity footer                                      */
+/* ------------------------------------------------------------------ */
+
+.app-footer {
+  padding: 1rem;
+  border-top: 1px solid #d1d5db;
+  color: #4b5563;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.release-version {
+  font-weight: 600;
+}

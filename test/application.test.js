@@ -33,7 +33,8 @@ test("home page displays the CSMS starter details", async () => {
     /JavaScript with Express\.js/
   );
 
-  assert.match(response.text, /0\.1\.0/);
+  // T16: the final release version replaced the starter version 0.1.0.
+  assert.match(response.text, /1\.0\.0/);
 });
 
 test("health endpoint returns the expected payload", async () => {
@@ -44,7 +45,7 @@ test("health endpoint returns the expected payload", async () => {
   assert.deepEqual(response.body, {
     status: "ok",
     application: "Community Services Management System",
-    version: "0.1.0"
+    version: "1.0.0"
   });
 });
 
