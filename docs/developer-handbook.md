@@ -116,6 +116,12 @@ complexity.
 Current Endpoints
 GET /
 GET /health
+GET  /residents                    (list; ?search= searches by name)
+GET  /residents/register           (registration form)
+POST /residents/register           (register through T04)
+GET  /residents/:id/edit           (prefilled edit form)
+POST /residents/:id/update         (update through T06)
+POST /residents/:id/deactivate     (soft deactivation through T07)
 
 Unknown routes return HTTP 404.
 

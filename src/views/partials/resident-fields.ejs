@@ -1,0 +1,29 @@
+<%
+  const fields = [
+    { name: "firstName", label: "First Name", type: "text", autocomplete: "given-name" },
+    { name: "lastName", label: "Last Name", type: "text", autocomplete: "family-name" },
+    { name: "address", label: "Address", type: "text", autocomplete: "street-address" },
+    { name: "contactNumber", label: "Contact Number", type: "tel", autocomplete: "tel", hint: "Format: 09XXXXXXXXX" },
+    { name: "email", label: "Email", type: "email", autocomplete: "email" }
+  ];
+  const invalidFields = errors.map((error) => error.field);
+%>
+<% fields.forEach((field) => { %>
+  <div class="field<%= invalidFields.includes(field.name) ? ' field-invalid' : '' %>">
+    <label for="<%= field.name %>"><%= field.label %></label>
+
+    <input
+      id="<%= field.name %>"
+      name="<%= field.name %>"
+      type="<%= field.type %>"
+      value="<%= values[field.name] %>"
+      autocomplete="<%= field.autocomplete %>"
+      required
+      <% if (invalidFields.includes(field.name)) { %>aria-invalid="true"<% } %>
+    >
+
+    <% if (field.hint) { %>
+      <small class="hint"><%= field.hint %></small>
+    <% } %>
+  </div>
+<% }) %>
