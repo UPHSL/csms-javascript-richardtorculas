@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import express from "express";
 
+import { applicationConfig } from "./config/application.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 import { ResidentRepository } from "./repositories/ResidentRepository.js";
@@ -89,6 +90,14 @@ export function createApp({ residentRepository, serviceRequestRepository } = {})
 
   app.set("views", path.join(currentDirectory, "views"));
   app.set("view engine", "ejs");
+
+  // Release identity for every rendered page (shared footer).  It comes
+  // from applicationConfig, the same source /health reports from.
+  app.locals.release = Object.freeze({
+    name: applicationConfig.name,
+    shortName: applicationConfig.shortName,
+    version: applicationConfig.version
+  });
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
