@@ -128,7 +128,7 @@ No temporary test database files were left behind after the two runs. No earlier
 
 ## 8. Tools and References Used
 
-- **AI coding assistant: I used Claude Code (Anthropic's Claude AI model) during T16** to help plan the version design, write the code, tests and documentation, and run the verification commands. I reviewed the changes and the test results, and I am responsible for understanding and explaining this implementation.
+- **AI coding assistant: I used Claude Code (Anthropic's Claude AI model) during T16** for occasional code suggestions, syntax reference, and sanity-checking edge cases. I reviewed, adapted, and verified all code, tests, and documentation myself, and I am responsible for understanding and explaining the implementation.
 - Visual Studio Code (IDE).
 - Node.js documentation (`node:module` `createRequire`, `node:test` test runner, `node:sqlite`).
 - Express.js documentation (`app.locals`, routing, error handling).
