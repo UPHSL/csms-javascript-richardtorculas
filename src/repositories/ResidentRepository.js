@@ -207,6 +207,44 @@ export class ResidentRepository {
   }
 
   /**
+   * Count every persisted Resident, Active and Inactive alike.
+   *
+   * T14 asks SQLite to do the counting (COUNT(*)) instead of loading every
+   * Resident into memory.
+   *
+   * @returns {number} The number of persisted Residents.
+   */
+  countAll() {
+    const query = this._db.prepare(`
+      SELECT COUNT(*) AS total
+      FROM   residents
+    `);
+
+    return Number(query.get().total);
+  }
+
+  /**
+   * Count persisted Residents grouped by their stored status.
+   *
+   * Uses GROUP BY so the aggregation happens in the database.  Statuses with
+   * no Residents are simply absent from the result.
+   *
+   * @returns {Object<string, number>} Map of status to Resident count,
+   *   e.g. { Active: 12, Inactive: 3 }.
+   */
+  countByStatus() {
+    const query = this._db.prepare(`
+      SELECT   status, COUNT(*) AS total
+      FROM     residents
+      GROUP BY status
+    `);
+
+    return Object.fromEntries(
+      query.all().map((row) => [row.status, Number(row.total)])
+    );
+  }
+
+  /**
    * Map a raw SQLite row to a Resident domain object.
    *
    * The database stores names in snake_case (first_name, last_name,
