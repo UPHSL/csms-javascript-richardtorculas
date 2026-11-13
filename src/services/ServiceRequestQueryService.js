@@ -1,3 +1,5 @@
+import { SUPPORTED_SERVICE_REQUEST_STATUSES } from "./ServiceRequestStatusService.js";
+
 /**
  * Coordinates Service Request listing, viewing, searching, and filtering.
  *
@@ -17,7 +19,7 @@ export class ServiceRequestQueryService {
   /**
    * Supported Service Request lifecycle statuses (T10).
    */
-  static SUPPORTED_STATUSES = ["Pending", "In Progress", "Completed", "Cancelled"];
+  static SUPPORTED_STATUSES = SUPPORTED_SERVICE_REQUEST_STATUSES;
 
   constructor(serviceRequestRepository) {
     this.serviceRequestRepository = serviceRequestRepository;

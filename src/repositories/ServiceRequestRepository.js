@@ -1,5 +1,6 @@
 import { ServiceRequest } from "../models/ServiceRequest.js";
 import { openDatabase } from "../database/database.js";
+import { containsPattern } from "../database/likePattern.js";
 
 /**
  * T11 deterministic Service Request ordering, shared by listing, searching,
@@ -169,17 +170,21 @@ export class ServiceRequestRepository {
    *
    * Results use the same deterministic ordering as listServiceRequests().
    *
+   * LIKE wildcards ("%" and "_") typed by the user are escaped (T15), so
+   * they are searched for literally instead of matching every request.
+   *
    * @param {string} searchTerm - Trimmed, non-blank text to search for.
    * @param {string|null} statusFilter - Optional status to filter by.
    * @returns {ServiceRequest[]} Matching Service Request records, or an empty array.
    */
   searchServiceRequests(searchTerm, statusFilter = null) {
-    const pattern = `%${searchTerm}%`;
+    const pattern = containsPattern(searchTerm);
 
     let sql = `
       SELECT id, resident_id, service_type, description, date_requested, status
       FROM   service_requests
-      WHERE  (service_type LIKE :pattern OR description LIKE :pattern)
+      WHERE  (service_type LIKE :pattern ESCAPE '\\'
+              OR description LIKE :pattern ESCAPE '\\')
     `;
 
     const params = { pattern };
