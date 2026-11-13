@@ -1,0 +1,36 @@
+<%- include("../partials/header") %>
+
+<p><a href="/residents">&larr; Back to Resident Management</a></p>
+
+<section class="panel">
+  <h1>Edit Resident</h1>
+
+  <dl class="readonly">
+    <div>
+      <dt>Resident ID</dt>
+      <dd><%= resident.id %></dd>
+    </div>
+
+    <div>
+      <dt>Status</dt>
+      <dd>
+        <span class="badge badge-<%= resident.status.toLowerCase() %>">
+          <%= resident.status %>
+        </span>
+      </dd>
+    </div>
+  </dl>
+
+  <%- include("../partials/validation-errors") %>
+
+  <form class="resident-form" method="post" action="/residents/<%= resident.id %>/update">
+    <%- include("../partials/resident-fields") %>
+
+    <div class="form-actions">
+      <button class="button button-primary" type="submit">Save Changes</button>
+      <a class="button button-link" href="/residents">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>

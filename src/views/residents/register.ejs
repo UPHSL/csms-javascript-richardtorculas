@@ -1,0 +1,22 @@
+<%- include("../partials/header") %>
+
+<p><a href="/residents">&larr; Back to Resident Management</a></p>
+
+<section class="panel">
+  <h1>Register Resident</h1>
+
+  <p class="muted">New Residents are registered with an Active status.</p>
+
+  <%- include("../partials/validation-errors") %>
+
+  <form class="resident-form" method="post" action="/residents/register">
+    <%- include("../partials/resident-fields") %>
+
+    <div class="form-actions">
+      <button class="button button-primary" type="submit">Register Resident</button>
+      <a class="button button-link" href="/residents">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>

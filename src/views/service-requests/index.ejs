@@ -1,0 +1,95 @@
+<%- include("../partials/header") %>
+
+<div class="page-heading">
+  <h1>Service Request Management</h1>
+
+  <a class="button button-primary" href="/service-requests/new">
+    Submit Service Request
+  </a>
+</div>
+
+<% if (notice) { %>
+  <div class="alert alert-success" role="status"><%= notice %></div>
+<% } %>
+
+<% if (error) { %>
+  <div class="alert alert-error" role="alert"><%= error %></div>
+<% } %>
+
+<form class="search" method="get" action="/service-requests" role="search">
+  <div class="search-controls">
+    <div class="search-field">
+      <label for="search">Search service type or description</label>
+      <input
+        id="search"
+        name="search"
+        type="search"
+        value="<%= search %>"
+      >
+    </div>
+
+    <div class="search-field search-field-narrow">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">All Statuses</option>
+        <% statuses.forEach((option) => { %>
+          <option value="<%= option %>"<%= option === status ? " selected" : "" %>><%= option %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="search-buttons">
+      <button class="button" type="submit">Search</button>
+
+      <% if (search.trim().length > 0 || status !== "") { %>
+        <a class="button button-link" href="/service-requests">Clear</a>
+      <% } %>
+    </div>
+  </div>
+</form>
+
+<% if (rows.length === 0) { %>
+  <p class="empty">No Service Requests found.</p>
+<% } else { %>
+  <div class="table-wrapper">
+    <table class="records">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Resident ID</th>
+          <th scope="col">Service Type</th>
+          <th scope="col">Description</th>
+          <th scope="col">Date Requested</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% rows.forEach(({ serviceRequest, actions }) => { %>
+          <tr>
+            <td><%= serviceRequest.id %></td>
+            <td><%= serviceRequest.residentId %></td>
+            <td><%= serviceRequest.serviceType %></td>
+            <td><%= serviceRequest.description.length > 60
+              ? serviceRequest.description.slice(0, 57) + "..."
+              : serviceRequest.description %></td>
+            <td><%= serviceRequest.dateRequested %></td>
+            <td><%- include("../partials/status-badge", { status: serviceRequest.status }) %></td>
+            <td class="actions">
+              <a class="button button-small" href="/service-requests/<%= serviceRequest.id %>">
+                View
+              </a>
+              <%- include("../partials/service-request-actions", {
+                actions,
+                serviceRequestId: serviceRequest.id
+              }) %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include("../partials/footer") %>

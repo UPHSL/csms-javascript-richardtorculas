@@ -28,6 +28,12 @@ temp/
 *.seed
 *.pid.lock
 
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+src/database/data/*.db
+
 # IDE settings
 .vscode/
 .idea/

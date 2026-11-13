@@ -116,6 +116,20 @@ complexity.
 Current Endpoints
 GET /
 GET /health
+GET  /dashboard                    (read-only summary through DashboardService)
+GET  /residents                    (list; ?search= searches by name)
+GET  /residents/register           (registration form)
+POST /residents/register           (register through T04)
+GET  /residents/:id/edit           (prefilled edit form)
+POST /residents/:id/update         (update through T06)
+POST /residents/:id/deactivate     (soft deactivation through T07)
+GET  /service-requests             (list; ?search= and ?status= through T11)
+GET  /service-requests/new         (submission form)
+POST /service-requests             (submit through T09)
+GET  /service-requests/:id         (details through T11)
+POST /service-requests/:id/start   (Pending -> In Progress through T10)
+POST /service-requests/:id/complete (In Progress -> Completed through T10)
+POST /service-requests/:id/cancel  (Pending/In Progress -> Cancelled through T10)
 
 Unknown routes return HTTP 404.
 

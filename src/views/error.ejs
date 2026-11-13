@@ -1,0 +1,15 @@
+<%- include("partials/header") %>
+
+<section class="panel">
+  <h1><%= title %></h1>
+
+  <p><%= message %></p>
+
+  <p>
+    <a href="<%= locals.backHref ?? "/residents" %>">
+      &larr; Back to <%= locals.backLabel ?? "Resident Management" %>
+    </a>
+  </p>
+</section>
+
+<%- include("partials/footer") %>

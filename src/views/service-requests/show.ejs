@@ -1,0 +1,65 @@
+<%- include("../partials/header") %>
+
+<p><a href="/service-requests">&larr; Back to Service Request Management</a></p>
+
+<section class="panel">
+  <h1>Service Request #<%= serviceRequest.id %></h1>
+
+  <% if (notice) { %>
+    <div class="alert alert-success" role="status"><%= notice %></div>
+  <% } %>
+
+  <% if (error) { %>
+    <div class="alert alert-error" role="alert"><%= error %></div>
+  <% } %>
+
+  <dl class="detail-list">
+    <div>
+      <dt>ID</dt>
+      <dd><%= serviceRequest.id %></dd>
+    </div>
+
+    <div>
+      <dt>Resident ID</dt>
+      <dd><%= serviceRequest.residentId %></dd>
+    </div>
+
+    <div>
+      <dt>Service Type</dt>
+      <dd><%= serviceRequest.serviceType %></dd>
+    </div>
+
+    <div>
+      <dt>Description</dt>
+      <dd class="description-full"><%= serviceRequest.description %></dd>
+    </div>
+
+    <div>
+      <dt>Date Requested</dt>
+      <dd><%= serviceRequest.dateRequested %></dd>
+    </div>
+
+    <div>
+      <dt>Status</dt>
+      <dd><%- include("../partials/status-badge", { status: serviceRequest.status }) %></dd>
+    </div>
+  </dl>
+
+  <h2>Workflow</h2>
+
+  <% if (actions.length > 0) { %>
+    <div class="actions">
+      <%- include("../partials/service-request-actions", {
+        actions,
+        serviceRequestId: serviceRequest.id
+      }) %>
+    </div>
+  <% } else { %>
+    <p class="muted">
+      This Service Request is <%= serviceRequest.status %>.
+      No further workflow actions are available.
+    </p>
+  <% } %>
+</section>
+
+<%- include("../partials/footer") %>
