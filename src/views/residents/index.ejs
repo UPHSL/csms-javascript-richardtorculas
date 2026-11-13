@@ -1,0 +1,86 @@
+<%- include("../partials/header") %>
+
+<div class="page-heading">
+  <h1>Resident Management</h1>
+
+  <a class="button button-primary" href="/residents/register">
+    Register Resident
+  </a>
+</div>
+
+<% if (notice) { %>
+  <div class="alert alert-success" role="status"><%= notice %></div>
+<% } %>
+
+<form class="search" method="get" action="/residents" role="search">
+  <label for="search">Search by first or last name</label>
+
+  <div class="search-controls">
+    <input
+      id="search"
+      name="search"
+      type="search"
+      value="<%= search %>"
+    >
+
+    <button class="button" type="submit">Search</button>
+
+    <% if (search.trim().length > 0) { %>
+      <a class="button button-link" href="/residents">Clear</a>
+    <% } %>
+  </div>
+</form>
+
+<% if (residents.length === 0) { %>
+  <p class="empty">No Residents found.</p>
+<% } else { %>
+  <div class="table-wrapper">
+    <table class="residents">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Address</th>
+          <th scope="col">Contact Number</th>
+          <th scope="col">Email</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% residents.forEach((resident) => { %>
+          <tr>
+            <td><%= resident.id %></td>
+            <td><%= resident.firstName %></td>
+            <td><%= resident.lastName %></td>
+            <td><%= resident.address %></td>
+            <td><%= resident.contactNumber %></td>
+            <td><%= resident.email %></td>
+            <td>
+              <span class="badge badge-<%= resident.status.toLowerCase() %>">
+                <%= resident.status %>
+              </span>
+            </td>
+            <td class="actions">
+              <a class="button button-small" href="/residents/<%= resident.id %>/edit">
+                Edit
+              </a>
+
+              <% if (resident.status === "Active") { %>
+                <form method="post" action="/residents/<%= resident.id %>/deactivate">
+                  <button class="button button-small button-secondary" type="submit">
+                    Deactivate
+                  </button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include("../partials/footer") %>

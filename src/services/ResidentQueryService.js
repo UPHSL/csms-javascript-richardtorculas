@@ -44,4 +44,17 @@ export class ResidentQueryService {
 
     return this.repository.searchResidents(normalized);
   }
+
+  /**
+   * Retrieve a single persisted Resident by its identifier.
+   *
+   * T12 uses this read-only lookup to prefill the Resident Edit form, so
+   * the presentation layer never needs to reach into the repository.
+   *
+   * @param {number} residentId - The persisted id to look up.
+   * @returns {Resident|null} The matching Resident, or null when not found.
+   */
+  findResidentById(residentId) {
+    return this.repository.findById(residentId);
+  }
 }
