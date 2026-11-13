@@ -1,0 +1,8 @@
+<% actions.forEach((action) => { %>
+  <form method="post" action="/service-requests/<%= serviceRequestId %>/<%= action.key %>">
+    <button
+      class="button button-small <%= action.key === "cancel" ? "button-secondary" : "button-primary" %>"
+      type="submit"
+    ><%= action.label %></button>
+  </form>
+<% }) %>

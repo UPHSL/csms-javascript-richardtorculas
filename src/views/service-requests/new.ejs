@@ -1,0 +1,72 @@
+<%- include("../partials/header") %>
+
+<p><a href="/service-requests">&larr; Back to Service Request Management</a></p>
+
+<section class="panel">
+  <h1>Submit Service Request</h1>
+
+  <p class="muted">
+    New Service Requests are submitted with a Pending status.
+    Need a Resident ID? <a href="/residents">View Residents</a>.
+  </p>
+
+  <%- include("../partials/validation-errors") %>
+
+  <% const invalidFields = errors.map((error) => error.field); %>
+
+  <form class="resident-form" method="post" action="/service-requests">
+    <div class="field<%= invalidFields.includes("residentId") ? " field-invalid" : "" %>">
+      <label for="residentId">Resident ID</label>
+      <input
+        id="residentId"
+        name="residentId"
+        type="number"
+        min="1"
+        step="1"
+        inputmode="numeric"
+        value="<%= values.residentId %>"
+        required
+      >
+    </div>
+
+    <div class="field<%= invalidFields.includes("serviceType") ? " field-invalid" : "" %>">
+      <label for="serviceType">Service Type</label>
+      <input
+        id="serviceType"
+        name="serviceType"
+        type="text"
+        value="<%= values.serviceType %>"
+        required
+      >
+      <small class="hint">For example: Barangay Clearance</small>
+    </div>
+
+    <div class="field<%= invalidFields.includes("description") ? " field-invalid" : "" %>">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="4"
+        required
+      ><%= values.description %></textarea>
+    </div>
+
+    <div class="field<%= invalidFields.includes("dateRequested") ? " field-invalid" : "" %>">
+      <label for="dateRequested">Date Requested</label>
+      <input
+        id="dateRequested"
+        name="dateRequested"
+        type="date"
+        value="<%= values.dateRequested %>"
+        required
+      >
+    </div>
+
+    <div class="form-actions">
+      <button class="button button-primary" type="submit">Submit Service Request</button>
+      <a class="button button-link" href="/service-requests">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<%- include("../partials/footer") %>

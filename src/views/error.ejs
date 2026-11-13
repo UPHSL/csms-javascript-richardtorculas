@@ -5,7 +5,11 @@
 
   <p><%= message %></p>
 
-  <p><a href="/residents">&larr; Back to Resident Management</a></p>
+  <p>
+    <a href="<%= locals.backHref ?? "/residents" %>">
+      &larr; Back to <%= locals.backLabel ?? "Resident Management" %>
+    </a>
+  </p>
 </section>
 
 <%- include("partials/footer") %>

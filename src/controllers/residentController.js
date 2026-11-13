@@ -1,4 +1,5 @@
 import { Resident } from "../models/Resident.js";
+import { parseRouteId } from "../utils/requestParsing.js";
 
 /**
  * Editable Resident fields accepted from browser forms (T04/T06).
@@ -64,20 +65,6 @@ function toValidationMessages(errorFields) {
     field,
     message: VALIDATION_MESSAGES[field] ?? `${field} is invalid.`
   }));
-}
-
-/**
- * Parse a Resident id route parameter.
- *
- * @param {string} value - Raw route parameter.
- * @returns {number|null} A positive integer id, or null when malformed.
- */
-function parseResidentId(value) {
-  if (!/^[1-9][0-9]*$/.test(String(value))) {
-    return null;
-  }
-
-  return Number(value);
 }
 
 /**
@@ -164,7 +151,7 @@ export function createResidentController(getServices) {
      */
     showEditForm(request, response) {
       const { queryService } = getServices();
-      const residentId = parseResidentId(request.params.id);
+      const residentId = parseRouteId(request.params.id);
       const resident = residentId === null
         ? null
         : queryService.findResidentById(residentId);
@@ -187,7 +174,7 @@ export function createResidentController(getServices) {
      */
     updateResident(request, response) {
       const { queryService, updateService } = getServices();
-      const residentId = parseResidentId(request.params.id);
+      const residentId = parseRouteId(request.params.id);
 
       if (residentId === null) {
         renderResidentNotFound(response);
@@ -220,7 +207,7 @@ export function createResidentController(getServices) {
      */
     deactivateResident(request, response) {
       const { deactivationService } = getServices();
-      const residentId = parseResidentId(request.params.id);
+      const residentId = parseRouteId(request.params.id);
 
       if (residentId === null) {
         renderResidentNotFound(response);
