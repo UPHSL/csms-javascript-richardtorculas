@@ -116,6 +116,7 @@ complexity.
 Current Endpoints
 GET /
 GET /health
+GET  /dashboard                    (read-only summary through DashboardService)
 GET  /residents                    (list; ?search= searches by name)
 GET  /residents/register           (registration form)
 POST /residents/register           (register through T04)

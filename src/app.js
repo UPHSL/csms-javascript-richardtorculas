@@ -7,9 +7,11 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 import { ResidentRepository } from "./repositories/ResidentRepository.js";
 import { ServiceRequestRepository } from "./repositories/ServiceRequestRepository.js";
+import { createDashboardRoutes } from "./routes/dashboardRoutes.js";
 import mainRoutes from "./routes/index.js";
 import { createResidentRoutes } from "./routes/residentRoutes.js";
 import { createServiceRequestRoutes } from "./routes/serviceRequestRoutes.js";
+import { DashboardService } from "./services/DashboardService.js";
 import { ResidentDeactivationService } from "./services/ResidentDeactivationService.js";
 import { ResidentQueryService } from "./services/ResidentQueryService.js";
 import { ResidentRegistrationService } from "./services/ResidentRegistrationService.js";
@@ -26,7 +28,8 @@ const currentDirectory = path.dirname(currentFile);
 
 /**
  * Build the existing Resident (T04-T07) and Service Request (T09-T11)
- * application services.  Repositories are created on first use so that
+ * application services, plus the read-only T14 DashboardService.
+ * Repositories are created on first use so that
  * starting the app (or importing it in tests) does not open the default
  * database until a management page is actually requested.
  *
@@ -55,7 +58,8 @@ function createServiceRegistry({ residentRepository, serviceRequestRepository })
           residents
         ),
         serviceRequestStatusService: new ServiceRequestStatusService(serviceRequests),
-        serviceRequestQueryService: new ServiceRequestQueryService(serviceRequests)
+        serviceRequestQueryService: new ServiceRequestQueryService(serviceRequests),
+        dashboardService: new DashboardService(residents, serviceRequests)
       };
     }
 
@@ -91,6 +95,7 @@ export function createApp({ residentRepository, serviceRequestRepository } = {})
   app.use(express.static(path.join(currentDirectory, "..", "public")));
 
   app.use(mainRoutes);
+  app.use(createDashboardRoutes(getServices));
   app.use(createResidentRoutes(getServices));
   app.use(createServiceRequestRoutes(getServices));
 

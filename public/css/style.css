@@ -442,3 +442,67 @@ textarea {
     gap: 0.1rem;
   }
 }
+
+
+/* ------------------------------------------------------------------ */
+/* T14 - CSMS Dashboard                                               */
+/* ------------------------------------------------------------------ */
+
+.dashboard-section {
+  margin-bottom: 2rem;
+}
+
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.page .section-heading h2 {
+  margin: 0;
+}
+
+.section-heading a {
+  color: #1d4ed8;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem;
+}
+
+.stat {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.stat-label {
+  color: #4b5563;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat-note {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.stat-highlight {
+  border-color: #1d4ed8;
+  background: #eff6ff;
+}

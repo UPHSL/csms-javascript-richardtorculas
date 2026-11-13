@@ -1,0 +1,103 @@
+<%- include("partials/header") %>
+
+<%
+  const residentMetrics = [
+    { key: "residents-total", label: "Total Residents", value: residents.total },
+    { key: "residents-active", label: "Active Residents", value: residents.active },
+    { key: "residents-inactive", label: "Inactive Residents", value: residents.inactive }
+  ];
+
+  const serviceRequestMetrics = [
+    { key: "service-requests-total", label: "Total Service Requests", value: serviceRequests.total },
+    { key: "service-requests-pending", label: "Pending", value: serviceRequests.pending },
+    { key: "service-requests-in-progress", label: "In Progress", value: serviceRequests.inProgress },
+    { key: "service-requests-completed", label: "Completed", value: serviceRequests.completed },
+    { key: "service-requests-cancelled", label: "Cancelled", value: serviceRequests.cancelled }
+  ];
+%>
+
+<div class="page-heading">
+  <h1>CSMS Dashboard</h1>
+</div>
+
+<section class="dashboard-section" aria-labelledby="resident-summary">
+  <div class="section-heading">
+    <h2 id="resident-summary">Resident Summary</h2>
+    <a href="/residents">Go to Resident Management &rarr;</a>
+  </div>
+
+  <div class="stats">
+    <% residentMetrics.forEach((metric) => { %>
+      <div class="stat" data-metric="<%= metric.key %>">
+        <span class="stat-label"><%= metric.label %></span>
+        <span class="stat-value"><%= metric.value %></span>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="dashboard-section" aria-labelledby="service-request-summary">
+  <div class="section-heading">
+    <h2 id="service-request-summary">Service Request Summary</h2>
+    <a href="/service-requests">Go to Service Request Management &rarr;</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat stat-highlight" data-metric="service-requests-open">
+      <span class="stat-label">Open Service Requests</span>
+      <span class="stat-value"><%= serviceRequests.open %></span>
+      <span class="stat-note">Pending + In Progress</span>
+    </div>
+
+    <% serviceRequestMetrics.forEach((metric) => { %>
+      <div class="stat" data-metric="<%= metric.key %>">
+        <span class="stat-label"><%= metric.label %></span>
+        <span class="stat-value"><%= metric.value %></span>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="dashboard-section" aria-labelledby="recent-service-requests">
+  <div class="section-heading">
+    <h2 id="recent-service-requests">Recent Service Requests</h2>
+  </div>
+
+  <% if (recentServiceRequests.length === 0) { %>
+    <p class="empty">No Service Requests available.</p>
+  <% } else { %>
+    <div class="table-wrapper">
+      <table class="records">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Resident ID</th>
+            <th scope="col">Service Type</th>
+            <th scope="col">Date Requested</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% recentServiceRequests.forEach((serviceRequest) => { %>
+            <tr>
+              <td><%= serviceRequest.id %></td>
+              <td><%= serviceRequest.residentId %></td>
+              <td><%= serviceRequest.serviceType %></td>
+              <td><%= serviceRequest.dateRequested %></td>
+              <td><%- include("partials/status-badge", { status: serviceRequest.status }) %></td>
+              <td class="actions">
+                <a class="button button-small" href="/service-requests/<%= serviceRequest.id %>">
+                  View
+                </a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>
+
+<%- include("partials/footer") %>

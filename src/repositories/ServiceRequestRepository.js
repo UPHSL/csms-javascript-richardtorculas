@@ -2,6 +2,12 @@ import { ServiceRequest } from "../models/ServiceRequest.js";
 import { openDatabase } from "../database/database.js";
 
 /**
+ * T11 deterministic Service Request ordering, shared by listing, searching,
+ * filtering, and the T14 recent-request query so they can never drift apart.
+ */
+const T11_ORDER_BY = "ORDER BY date_requested DESC, id DESC";
+
+/**
  * Handles persistence of Service Requests using SQLite.
  *
  * Accepts an optional dbPath so that automated tests can supply a
@@ -146,8 +152,7 @@ export class ServiceRequestRepository {
     const query = this._db.prepare(`
       SELECT id, resident_id, service_type, description, date_requested, status
       FROM   service_requests
-      ORDER BY date_requested DESC,
-               id DESC
+      ${T11_ORDER_BY}
     `);
 
     return query.all()
@@ -185,8 +190,7 @@ export class ServiceRequestRepository {
     }
 
     sql += `
-      ORDER BY date_requested DESC,
-               id DESC
+      ${T11_ORDER_BY}
     `;
 
     const query = this._db.prepare(sql);
@@ -207,11 +211,68 @@ export class ServiceRequestRepository {
       SELECT id, resident_id, service_type, description, date_requested, status
       FROM   service_requests
       WHERE  status = :statusFilter
-      ORDER BY date_requested DESC,
-               id DESC
+      ${T11_ORDER_BY}
     `);
 
     return query.all({ statusFilter })
+      .map((row) => this._rowToServiceRequest(row));
+  }
+
+  /**
+   * Count every persisted Service Request regardless of status.
+   *
+   * T14 asks SQLite to do the counting (COUNT(*)) instead of loading every
+   * Service Request into memory.
+   *
+   * @returns {number} The number of persisted Service Requests.
+   */
+  countAll() {
+    const query = this._db.prepare(`
+      SELECT COUNT(*) AS total
+      FROM   service_requests
+    `);
+
+    return Number(query.get().total);
+  }
+
+  /**
+   * Count persisted Service Requests grouped by their stored status.
+   *
+   * Uses GROUP BY so the aggregation happens in the database.  Statuses with
+   * no Service Requests are simply absent from the result.
+   *
+   * @returns {Object<string, number>} Map of status to count,
+   *   e.g. { "Pending": 4, "In Progress": 2 }.
+   */
+  countByStatus() {
+    const query = this._db.prepare(`
+      SELECT   status, COUNT(*) AS total
+      FROM     service_requests
+      GROUP BY status
+    `);
+
+    return Object.fromEntries(
+      query.all().map((row) => [row.status, Number(row.total)])
+    );
+  }
+
+  /**
+   * Retrieve the most recent Service Requests using the T11 ordering.
+   *
+   * The LIMIT is applied by SQLite, so only the requested rows are read.
+   *
+   * @param {number} limit - Maximum number of Service Requests to return.
+   * @returns {ServiceRequest[]} Up to `limit` Service Requests, most recent first.
+   */
+  findRecent(limit) {
+    const query = this._db.prepare(`
+      SELECT id, resident_id, service_type, description, date_requested, status
+      FROM   service_requests
+      ${T11_ORDER_BY}
+      LIMIT  :limit
+    `);
+
+    return query.all({ limit })
       .map((row) => this._rowToServiceRequest(row));
   }
 
