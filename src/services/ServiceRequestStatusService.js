@@ -1,4 +1,16 @@
-const SUPPORTED_STATUSES = ["Pending", "In Progress", "Completed", "Cancelled"];
+/**
+ * The single authoritative list of Service Request lifecycle statuses (T10).
+ * Other components (e.g. T11 querying) reference this list instead of
+ * keeping their own copy.
+ */
+export const SUPPORTED_SERVICE_REQUEST_STATUSES = Object.freeze([
+  "Pending",
+  "In Progress",
+  "Completed",
+  "Cancelled"
+]);
+
+const SUPPORTED_STATUSES = SUPPORTED_SERVICE_REQUEST_STATUSES;
 
 const ALLOWED_TRANSITIONS = {
   "Pending": ["In Progress", "Cancelled"],

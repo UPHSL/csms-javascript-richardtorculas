@@ -1,5 +1,6 @@
 ﻿import { Resident } from "../models/Resident.js";
 import { openDatabase } from "../database/database.js";
+import { containsPattern } from "../database/likePattern.js";
 
 /**
  * Handles persistence of Resident records using SQLite.
@@ -76,7 +77,7 @@ export class ResidentRepository {
     return this._rowToResident(row);
   }
 
-/**
+  /**
    * Update the permitted editable information of an existing persisted Resident.
    *
    * T06 deliberately touches only the editable columns:
@@ -187,6 +188,9 @@ export class ResidentRepository {
    * partial matches are case-insensitive by default.  Results use the
    * same deterministic ordering as listResidents().
    *
+   * LIKE wildcards ("%" and "_") typed by the user are escaped (T15), so
+   * they are searched for literally instead of matching every Resident.
+   *
    * @param {string} searchTerm - Trimmed, non-blank name text to search for.
    * @returns {Resident[]} Matching Resident records, or an empty array.
    */
@@ -194,13 +198,14 @@ export class ResidentRepository {
     const query = this._db.prepare(`
       SELECT id, first_name, last_name, address, contact_number, email, status
       FROM   residents
-      WHERE  first_name LIKE :pattern OR last_name LIKE :pattern
+      WHERE  first_name LIKE :pattern ESCAPE '\\'
+         OR  last_name  LIKE :pattern ESCAPE '\\'
       ORDER BY last_name  COLLATE NOCASE ASC,
                first_name COLLATE NOCASE ASC,
                id ASC
     `);
 
-    const pattern = `%${searchTerm}%`;
+    const pattern = containsPattern(searchTerm);
 
     return query.all({ pattern })
       .map((row) => this._rowToResident(row));
